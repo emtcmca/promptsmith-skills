@@ -188,12 +188,17 @@ function readSourceCommit() {
   const git = (args) =>
     execFileSync('git', args, { cwd: SRC, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
 
-  let sha, shortSha, date, dirty
+  let sha, shortSha, date, dirty, onRemote
   try {
     sha = git(['rev-parse', 'HEAD'])
     shortSha = git(['rev-parse', '--short', 'HEAD'])
     date = git(['log', '-1', '--format=%cs']) // YYYY-MM-DD, committer date
     dirty = git(['status', '--porcelain']).length > 0
+    // Is this commit reachable from any remote-tracking branch? A stamp pointing
+    // at a local-only commit produces provenance links that 404 for every reader,
+    // which is strictly worse than no links at all. Checked against existing
+    // remote refs only — no fetch, so this never mutates the source repo.
+    onRemote = git(['branch', '-r', '--contains', sha]).length > 0
   } catch (err) {
     fail(
       `ERROR: could not read the git commit of the promptsmith source at ${SRC}.`,
@@ -202,6 +207,19 @@ function readSourceCommit() {
       `Underlying error: ${err instanceof Error ? err.message : String(err)}`,
     )
   }
+  if (!onRemote) {
+    fail(
+      `ERROR: upstream commit ${shortSha} is not reachable from any remote branch.`,
+      ``,
+      `Every provenance link in the generated skills would be pinned to this commit,`,
+      `and every one of them would 404 for anyone who is not you.`,
+      ``,
+      `Either push the branch holding ${shortSha}, or build from a commit that is`,
+      `already published. Your remote-tracking refs may also just be stale — a`,
+      `'git fetch' inside ${SRC} would refresh them.`,
+    )
+  }
+
   return { sha, shortSha, date, dirty }
 }
 

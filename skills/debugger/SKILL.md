@@ -57,4 +57,4 @@ cause to look decisive.
 
 ---
 
-_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`d808d9c`](https://github.com/emtcmca/promptsmith/commit/d808d9cab1f1aac7691785bb399b3eff4f12dc24) (2026-07-26). At that commit, upstream carries [40 eval cases](https://github.com/emtcmca/promptsmith/tree/d808d9cab1f1aac7691785bb399b3eff4f12dc24/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/d808d9cab1f1aac7691785bb399b3eff4f12dc24/evals/known-bad). Apache-2.0._
+_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`2ac6dfe`](https://github.com/emtcmca/promptsmith/commit/2ac6dfe8f27afca6ea6828d12632dd7b037980db) (2026-07-22). At that commit, upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/2ac6dfe8f27afca6ea6828d12632dd7b037980db/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/2ac6dfe8f27afca6ea6828d12632dd7b037980db/evals/known-bad). Apache-2.0._
