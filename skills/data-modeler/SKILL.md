@@ -57,4 +57,4 @@ it, and flag where a different answer would change the schema.
 
 ---
 
-_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) — prompt & context engineering for agents. The promptsmith project ships 37 eval cases and 6 known-bad regression fixtures. Apache-2.0._
+_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`d808d9c`](https://github.com/emtcmca/promptsmith/commit/d808d9cab1f1aac7691785bb399b3eff4f12dc24) (2026-07-26). At that commit, upstream carries [40 eval cases](https://github.com/emtcmca/promptsmith/tree/d808d9cab1f1aac7691785bb399b3eff4f12dc24/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/d808d9cab1f1aac7691785bb399b3eff4f12dc24/evals/known-bad). Apache-2.0._

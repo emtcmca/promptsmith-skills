@@ -24,6 +24,7 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync } from 'node:fs'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { execFileSync } from 'node:child_process'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '..')
@@ -169,11 +170,79 @@ const SKILLS = [
   },
 ]
 
-const PROVENANCE =
-  '---\n\n' +
-  '_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) — prompt & context ' +
-  'engineering for agents. The promptsmith project ships 37 eval cases and 6 known-bad ' +
-  'regression fixtures. Apache-2.0._\n'
+const UPSTREAM = 'https://github.com/emtcmca/promptsmith'
+
+/**
+ * Reads the exact upstream commit this build is generated from.
+ *
+ * WHY THIS IS MANDATORY
+ * A distribution mirror with no source stamp is a mirror nobody can date, and a
+ * reader has no way to tell it apart from a stale one. Every claim the footer
+ * makes about upstream is only checkable if the reader knows WHICH upstream.
+ *
+ * The commit DATE is used rather than the build time on purpose: same source
+ * commit must produce byte-identical output, or the build stops being verifiable
+ * by re-running it. A wall-clock timestamp would make every run a diff.
+ */
+function readSourceCommit() {
+  const git = (args) =>
+    execFileSync('git', args, { cwd: SRC, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+
+  let sha, shortSha, date, dirty
+  try {
+    sha = git(['rev-parse', 'HEAD'])
+    shortSha = git(['rev-parse', '--short', 'HEAD'])
+    date = git(['log', '-1', '--format=%cs']) // YYYY-MM-DD, committer date
+    dirty = git(['status', '--porcelain']).length > 0
+  } catch (err) {
+    fail(
+      `ERROR: could not read the git commit of the promptsmith source at ${SRC}.`,
+      `A generated mirror must record which upstream commit it came from, so this is fatal.`,
+      `Make sure ${SRC} is a git checkout and that 'git' is on PATH.`,
+      `Underlying error: ${err instanceof Error ? err.message : String(err)}`,
+    )
+  }
+  return { sha, shortSha, date, dirty }
+}
+
+/**
+ * Counts the upstream eval corpus so the footer states a MEASURED number rather
+ * than one hardcoded here that silently drifts as upstream grows.
+ */
+function countEvals() {
+  const count = (dir, pattern) => {
+    const path = join(SRC, dir)
+    if (!existsSync(path)) return 0
+    return readdirSync(path).filter((f) => pattern.test(f)).length
+  }
+  return {
+    cases: count('evals/cases', /\.md$/),
+    knownBad: count('evals/known-bad', /^KB.*\.md$/),
+  }
+}
+
+/**
+ * The footer stamped onto every generated skill.
+ *
+ * Every factual claim here is either measured at build time or resolves to a URL
+ * pinned at the exact source commit — so a reader inside an installed skill can
+ * click through and count for themselves rather than taking our word for it.
+ */
+function buildProvenance({ commit, evals }) {
+  const tree = `${UPSTREAM}/tree/${commit.sha}`
+  const evidence =
+    evals.cases > 0 || evals.knownBad > 0
+      ? ` At that commit, upstream carries [${evals.cases} eval cases](${tree}/evals/cases) ` +
+        `and [${evals.knownBad} known-bad regression fixtures](${tree}/evals/known-bad).`
+      : ''
+
+  return (
+    '---\n\n' +
+    `_Generated from [promptsmith](${UPSTREAM}) at commit ` +
+    `[\`${commit.shortSha}\`](${UPSTREAM}/commit/${commit.sha}) (${commit.date}).` +
+    `${evidence} Apache-2.0._\n`
+  )
+}
 
 /**
  * Splits a markdown file into its YAML frontmatter block and its body.
@@ -182,12 +251,21 @@ const PROVENANCE =
  */
 function splitFrontmatter(raw, path) {
   const text = raw.replace(/\r\n/g, '\n')
+  // Route through fail() rather than throwing: an uncaught throw here surfaces as
+  // a raw stack trace, which reads like a bug in this script rather than what it
+  // actually is — a malformed source file the operator needs to go fix.
   if (!text.startsWith('---\n')) {
-    throw new Error(`${path}: expected YAML frontmatter starting with '---'`)
+    fail(
+      `ERROR: ${path}: expected YAML frontmatter starting with '---'.`,
+      `Fix the frontmatter in the promptsmith source file.`,
+    )
   }
   const end = text.indexOf('\n---\n', 3)
   if (end === -1) {
-    throw new Error(`${path}: frontmatter block is never closed`)
+    fail(
+      `ERROR: ${path}: frontmatter block is never closed.`,
+      `Add the closing '---' in the promptsmith source file.`,
+    )
   }
   return {
     frontmatter: text.slice(4, end + 1),
@@ -226,7 +304,7 @@ const DEAD_REF = /CLAUDE_PLUGIN_ROOT|(?:docs|evals|agents|commands)\/[A-Za-z0-9.
  * emit pass deletes skills/ before writing, so any exit *after* that point would
  * destroy the previous good output. Everything that can fail, fails here first.
  */
-function collect() {
+function collect(provenance) {
   const plans = []
 
   for (const skill of SKILLS) {
@@ -255,7 +333,7 @@ function collect() {
       `description: ${yamlString(skill.description)}\n` +
       `---\n\n` +
       `${body.trimEnd()}\n\n` +
-      PROVENANCE
+      provenance
 
     const deadInSkill = skillMd.match(DEAD_REF)
     if (deadInSkill) {
@@ -340,6 +418,40 @@ function emit(plans) {
   }
 }
 
+/**
+ * Rewrites the stamp block in README.md so the landing page states the same
+ * source commit the skills do. Fails if the markers are missing rather than
+ * silently leaving the README claiming to be a mirror of nothing in particular.
+ */
+function stampReadme({ commit, evals }) {
+  const START = '<!-- mirror-stamp:start -->'
+  const END = '<!-- mirror-stamp:end -->'
+  const path = join(REPO, 'README.md')
+
+  const readme = readFileSync(path, 'utf8').replace(/\r\n/g, '\n')
+  const from = readme.indexOf(START)
+  const to = readme.indexOf(END)
+  if (from === -1 || to === -1 || to < from) {
+    fail(
+      `ERROR: README.md is missing the ${START} / ${END} markers.`,
+      `The mirror stamp has nowhere to go. Restore the markers.`,
+    )
+  }
+
+  const tree = `${UPSTREAM}/tree/${commit.sha}`
+  const block =
+    `${START}\n` +
+    `Generated from [promptsmith](${UPSTREAM}) at commit ` +
+    `[\`${commit.shortSha}\`](${UPSTREAM}/commit/${commit.sha}), committed ${commit.date}. ` +
+    `At that commit upstream carries [${evals.cases} eval cases](${tree}/evals/cases) and ` +
+    `[${evals.knownBad} known-bad regression fixtures](${tree}/evals/known-bad) — ` +
+    `both links are pinned to that exact commit, so the counts are checkable rather than claimed.\n` +
+    `${END}`
+
+  writeFileSync(path, readme.slice(0, from) + block + readme.slice(to + END.length), 'utf8')
+  console.log(`  stamped README.md  (${commit.shortSha}, ${commit.date})`)
+}
+
 function main() {
   if (!existsSync(SRC)) {
     fail(
@@ -348,10 +460,25 @@ function main() {
     )
   }
 
-  const plans = collect()
-  emit(plans)
+  const commit = readSourceCommit()
+  const evals = countEvals()
 
-  console.log(`\nGenerated ${plans.length} skills from ${SRC}`)
+  // A dirty source tree means the stamped commit does not describe what was
+  // actually read. Warn loudly rather than stamping a commit that is a lie.
+  if (commit.dirty) {
+    console.warn(
+      `WARNING: ${SRC} has uncommitted changes. The stamp will say ${commit.shortSha}, ` +
+        `but the generated output reflects the working tree, not that commit.`,
+    )
+  }
+
+  const plans = collect(buildProvenance({ commit, evals }))
+  emit(plans)
+  stampReadme({ commit, evals })
+
+  console.log(
+    `\nGenerated ${plans.length} skills from ${SRC} @ ${commit.shortSha} (${commit.date})`,
+  )
 }
 
 main()

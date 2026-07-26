@@ -6,7 +6,7 @@ Thirteen prompt-engineering and software-delivery skills for AI agents. Install 
 npx skills add emtcmca/promptsmith-skills
 ```
 
-Works with Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini, and any other agent that reads `SKILL.md`.
+Any agent that reads `SKILL.md`. On a verification install the CLI reported installing to Claude Code, Codex, GitHub Copilot, Hermes Agent, and Qwen Code — that list is what was observed, not a compatibility matrix. These are plain prompts with no runtime, so nothing here is bound to a particular host.
 
 ---
 
@@ -55,11 +55,45 @@ Each skill has a **stated contract** — a role, a method, an output shape, and 
 
 The `prompt-engineering` skill bundles 12 review lenses (`accessibility`, `security-reviewer`, `visual-design`, `ai-tells`, `skeptic`, `editorial`, `seo`, `performance`, `api-design`, `data-integrity`, `product-strategist`, `ux-designer`) and 3 output templates. They ship inside the skill directory, so it works with no plugin and no configuration.
 
+That's a claim, so here is the receipt.
+
+<details>
+<summary><strong>Real excerpt — <code>debugger</code> on a production stack trace</strong> (click to expand)</summary>
+
+Given a two-frame `TypeError`, no source access, and a reporter who attributed it to a refactor "last Thursday," the skill produced:
+
+> **Unverified, as supplied by you** (not yet confirmed against any artifact I can see):
+> that it started last Thursday, that the server-component refactor is what changed, and
+> that the 3% figure is stable and is 3% of *loads* rather than 3% of *distinct invoices*.
+> Those three claims are doing most of the work in the ranking below.
+
+> **Reproduction** — I don't have one, and I can't construct one from what's here. **Declaring
+> the gap rather than guessing around it.**
+
+> **H1 — The refactor dropped a normalization layer that used to coerce a null/absent lines
+> field into `[]`.** *Why plausible:* the failing value is `undefined`, not `[]` — an invoice
+> with zero line items would render fine. *Cheapest probe:* read the pre-refactor fetch
+> function and look for `?? []` or a DTO mapper. Two minutes, zero deploys.
+
+> **Trigger vs. root cause.** The server-component move is the *trigger*. The root cause is
+> that `renderInvoiceLines` treats an optional field as guaranteed. Wrapping the access in
+> `?? []` would make the stack trace stop and tell you nothing about whether those 3% of
+> invoices are *supposed* to have line items. If they are, that guard converts a loud crash
+> into silent under-billing.
+
+Note what it refused to do: invent a reproduction, adopt the reporter's timeline as fact, or
+hand over the one-line patch.
+
+</details>
+
+Every skill was run once against a realistic input, with the full transcript, the defects each one found, and the limits of that exercise recorded in [`docs/test-runs/`](docs/test-runs/2026-07-26-skill-conversion-runs.md). Three of those runs found real defects in this repo.
+
 ---
 
 ## Honest limits
 
-- **Eval coverage is partial.** The upstream promptsmith project ships 37 eval cases and 6 known-bad regression fixtures. Ten of the thirteen skills here have at least one dedicated case; `refactor-planner`, `docs-writer`, and `frontend-builder` do not yet.
+- **Eval coverage is partial.** Upstream's eval corpus is counted and linked in the mirror stamp below, pinned to the exact commit this was built from. Not all of it covers what ships here: ten of these thirteen skills have at least one dedicated case, and `refactor-planner`, `docs-writer`, and `frontend-builder` have none. Verified against the stamped commit, not recalled.
+- **These were run, once each.** Every skill was executed against one realistic input and the results written up in [`docs/test-runs/`](docs/test-runs/2026-07-26-skill-conversion-runs.md). One run per skill is a sample, not a pass rate. The write-up lists what that exercise could not test — notably the prompt-injection guardrails, which no input exercised.
 - **No orchestration skill here.** promptsmith's `/orchestrate` coordinator dispatches subagents from a plugin-bundled gallery and can't run from a plain skills install. It stays in the [plugin](https://github.com/emtcmca/promptsmith).
 - **No API keys, no dependencies, no network calls.** These are prompts. They run wherever your agent runs.
 
@@ -69,7 +103,13 @@ The `prompt-engineering` skill bundles 12 review lenses (`accessibility`, `secur
 
 [promptsmith](https://github.com/emtcmca/promptsmith) is the source of truth and ships as a Claude Code plugin with slash commands (`/sharpen`, `/forge-agent`, `/lens`, `/orchestrate`) and a 20-agent gallery.
 
-This repo is a **generated distribution mirror**. It exists because skills.sh indexes `skills/<name>/SKILL.md`, and adding those directories to the plugin's own `skills/` folder would change what the plugin loads for existing users. Nothing here is hand-edited.
+This repo is a **generated distribution mirror**. It exists because skills.sh indexes `skills/<name>/SKILL.md`, and adding those directories to the plugin's own `skills/` folder would change what the plugin loads for existing users. Nothing under `skills/` is hand-edited.
+
+<!-- mirror-stamp:start -->
+Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`d808d9c`](https://github.com/emtcmca/promptsmith/commit/d808d9cab1f1aac7691785bb399b3eff4f12dc24), committed 2026-07-26. At that commit upstream carries [40 eval cases](https://github.com/emtcmca/promptsmith/tree/d808d9cab1f1aac7691785bb399b3eff4f12dc24/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/d808d9cab1f1aac7691785bb399b3eff4f12dc24/evals/known-bad) — both links are pinned to that exact commit, so the counts are checkable rather than claimed.
+<!-- mirror-stamp:end -->
+
+Every generated skill carries the same commit stamp in its own footer, so the provenance travels with the file after install rather than living only here.
 
 To regenerate after promptsmith changes:
 
