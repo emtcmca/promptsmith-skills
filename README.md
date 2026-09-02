@@ -6,6 +6,64 @@ Thirteen prompt-engineering and software-delivery skills for AI agents. Install 
 npx skills add emtcmca/promptsmith-skills
 ```
 
+![The engine turning a one-line request into a full prompt, in a live terminal run](https://raw.githubusercontent.com/emtcmca/promptsmith/main/docs/assets/sharpen-demo.gif)
+
+<sub>That's the engine running as a slash command in [promptsmith](https://github.com/emtcmca/promptsmith), the Claude Code plugin these are generated from. Installed as skills there is no slash command — you ask for the thing and your agent picks the skill up. Same prompt underneath.</sub>
+
+---
+
+## Try it before you install
+
+No install, no signup, no API key, no sandbox to spin up. These are prompts in plain markdown,
+so you can run one by hand in whatever chat you already have open — and decide from the output
+whether the install is worth it.
+
+**1.** Open **[`skills/debugger/SKILL.md`](https://raw.githubusercontent.com/emtcmca/promptsmith-skills/main/skills/debugger/SKILL.md)** and copy the whole file. It's about 60 lines and it is the entire skill — there is nothing else to fetch.
+
+**2.** Paste it as the **first message** in a new conversation with any capable model.
+
+**3.** Send your actual problem as the **second message**. If you don't have one handy, use this:
+
+```text
+Here is the failure:
+
+TypeError: Cannot read properties of undefined (reading 'map')
+    at renderInvoiceLines (invoice-table.tsx:88)
+    at InvoiceTable (invoice-table.tsx:41)
+
+It hits about 3% of invoice page loads. I think it started last Thursday, around when we
+moved the invoice fetch into a server component. I don't have a reproduction.
+```
+
+### What you should see
+
+This is the part worth actually checking, because it is what separates this from "you are a
+helpful debugging assistant." A good run does five things:
+
+- **Separates what you asserted from what it verified.** The "last Thursday," the server-component
+  refactor, and the 3% should come back labelled as *your* claims, not as facts — because all
+  three are load-bearing and none of them are confirmed.
+- **Refuses to invent a reproduction.** It should say plainly that it cannot construct one from
+  what you gave it, and name that as a gap rather than papering over it.
+- **Ranks hypotheses, each with the cheapest probe that kills it.** Not "try these five things" —
+  a specific observation per hypothesis, with a rough cost. "Read the pre-refactor fetch function
+  and look for `?? []`. Two minutes, zero deploys."
+- **Separates the trigger from the root cause.** The refactor is the trigger. The root cause is
+  code treating an optional field as guaranteed.
+- **Doesn't hand you the one-line patch.** It should point out that `?? []` silences the crash
+  while telling you nothing about whether those 3% of invoices are *supposed* to have line items —
+  and that if they are, the guard converts a loud crash into silent under-billing.
+
+If what you get back is a confident list of five things to try, with no distinction between what
+you told it and what it knows, you pasted the wrong file. The real transcript from this exact
+input is in [What makes these different](#what-makes-these-different) below.
+
+Any of the twelve specialist skills works this way — one file, one paste. The engine
+(`prompt-engineering`) is the exception: it loads twelve lens files and three templates from its
+own directory, so that one wants a real install.
+
+---
+
 ## Works in
 
 **Any agent that reads `SKILL.md`.** There is no runtime here, no API key, no dependency, and
@@ -116,7 +174,7 @@ Every skill was run once against a realistic input, with the full transcript, th
 This repo is a **generated distribution mirror**. It exists because skills.sh indexes `skills/<name>/SKILL.md`, and adding those directories to the plugin's own `skills/` folder would change what the plugin loads for existing users. Nothing under `skills/` is hand-edited.
 
 <!-- mirror-stamp:start -->
-Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`2398b2e`](https://github.com/emtcmca/promptsmith/commit/2398b2e31a08cab64d6badbe16b96eb5e7f59ea4), committed 2026-09-02. At that commit upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/2398b2e31a08cab64d6badbe16b96eb5e7f59ea4/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/2398b2e31a08cab64d6badbe16b96eb5e7f59ea4/evals/known-bad) — both links are pinned to that exact commit, so the counts are checkable rather than claimed.
+Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`207aada`](https://github.com/emtcmca/promptsmith/commit/207aadab34f175f2d900e93d1b49e2427a72cc03), committed 2026-07-21. At that commit upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/207aadab34f175f2d900e93d1b49e2427a72cc03/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/207aadab34f175f2d900e93d1b49e2427a72cc03/evals/known-bad) — both links are pinned to that exact commit, so the counts are checkable rather than claimed. That commit is the most recent one to touch anything this mirror reads or cites; promptsmith's own `main` may be further ahead on changes that cannot affect these files.
 <!-- mirror-stamp:end -->
 
 Every generated skill carries the same commit stamp in its own footer, so the provenance travels with the file after install rather than living only here.
