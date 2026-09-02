@@ -116,7 +116,7 @@ Every skill was run once against a realistic input, with the full transcript, th
 This repo is a **generated distribution mirror**. It exists because skills.sh indexes `skills/<name>/SKILL.md`, and adding those directories to the plugin's own `skills/` folder would change what the plugin loads for existing users. Nothing under `skills/` is hand-edited.
 
 <!-- mirror-stamp:start -->
-Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`2ac6dfe`](https://github.com/emtcmca/promptsmith/commit/2ac6dfe8f27afca6ea6828d12632dd7b037980db), committed 2026-07-22. At that commit upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/2ac6dfe8f27afca6ea6828d12632dd7b037980db/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/2ac6dfe8f27afca6ea6828d12632dd7b037980db/evals/known-bad) — both links are pinned to that exact commit, so the counts are checkable rather than claimed.
+Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`b863b9b`](https://github.com/emtcmca/promptsmith/commit/b863b9bdd373024b156667c037029587c0ae7271), committed 2026-09-02. At that commit upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/b863b9bdd373024b156667c037029587c0ae7271/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/b863b9bdd373024b156667c037029587c0ae7271/evals/known-bad) — both links are pinned to that exact commit, so the counts are checkable rather than claimed.
 <!-- mirror-stamp:end -->
 
 Every generated skill carries the same commit stamp in its own footer, so the provenance travels with the file after install rather than living only here.

@@ -64,4 +64,4 @@ state the assumption inline, and flag it — never ship an endpoint with a guess
 
 ---
 
-_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`2ac6dfe`](https://github.com/emtcmca/promptsmith/commit/2ac6dfe8f27afca6ea6828d12632dd7b037980db) (2026-07-22). At that commit, upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/2ac6dfe8f27afca6ea6828d12632dd7b037980db/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/2ac6dfe8f27afca6ea6828d12632dd7b037980db/evals/known-bad). Apache-2.0._
+_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`b863b9b`](https://github.com/emtcmca/promptsmith/commit/b863b9bdd373024b156667c037029587c0ae7271) (2026-09-02). At that commit, upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/b863b9bdd373024b156667c037029587c0ae7271/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/b863b9bdd373024b156667c037029587c0ae7271/evals/known-bad). Apache-2.0._
