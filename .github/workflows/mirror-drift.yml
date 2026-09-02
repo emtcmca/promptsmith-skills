@@ -1,0 +1,62 @@
+# Enforces the claim the README makes: skills/ is generated from promptsmith and
+# nothing under it is hand-edited.
+#
+# The job re-runs the generator against a fresh clone of promptsmith main and
+# fails if the result differs from what is committed here. Two things make it red:
+#
+#   1. Someone hand-edited a generated file.
+#   2. promptsmith moved and this mirror was not regenerated.
+#
+# (2) is the one that matters. Without this job the mirror rots silently while the
+# README keeps stamping a commit that is no longer upstream HEAD -- and the stamp
+# links to that commit, so a reader can check it faster than we can.
+name: mirror-drift
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Daily, 06:00 UTC. Catches (2), which no push to this repo ever triggers.
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the mirror
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Clone the promptsmith source
+        run: |
+          git clone --depth 50 --branch main \
+            https://github.com/emtcmca/promptsmith.git \
+            "${RUNNER_TEMP}/promptsmith"
+          echo "upstream HEAD: $(git -C "${RUNNER_TEMP}/promptsmith" rev-parse --short HEAD)"
+
+      - name: Regenerate skills/
+        env:
+          PROMPTSMITH_SRC: ${{ runner.temp }}/promptsmith
+        run: node scripts/build-skills.mjs
+
+      - name: Fail if the committed mirror differs from the regenerated one
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Mirror is out of date with promptsmith main."
+            echo
+            echo "Changed files:"
+            git status --short
+            echo
+            git --no-pager diff
+            echo
+            echo "Fix: clone promptsmith beside this repo, run 'node scripts/build-skills.mjs',"
+            echo "and commit the result. Do not hand-edit anything under skills/."
+            exit 1
+          fi
+          echo "Mirror matches promptsmith main. No drift."

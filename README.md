@@ -6,7 +6,17 @@ Thirteen prompt-engineering and software-delivery skills for AI agents. Install 
 npx skills add emtcmca/promptsmith-skills
 ```
 
-Any agent that reads `SKILL.md`. On a verification install the CLI reported installing to Claude Code, Codex, GitHub Copilot, Hermes Agent, and Qwen Code — that list is what was observed, not a compatibility matrix. These are plain prompts with no runtime, so nothing here is bound to a particular host.
+## Works in
+
+**Any agent that reads `SKILL.md`.** There is no runtime here, no API key, no dependency, and
+no host-specific syntax — these are prompts on disk, so nothing binds them to one vendor.
+
+A single verification install reported writing to **Claude Code, Codex, GitHub Copilot, Hermes
+Agent, and Qwen Code**. That is what one install observed, not a compatibility matrix, and it is
+not a claim that every one of them selects and runs the skill well. If you install these into any
+agent, [tell us what happened](https://github.com/emtcmca/promptsmith-skills/issues/new?template=host-compatibility.yml)
+— a failure report is worth more than a success report, and it is how that list becomes
+something better than one person's observation.
 
 ---
 
@@ -123,6 +133,12 @@ The generator fails loudly if an upstream reword breaks one of its path rewrites
 If you use Claude Code, install the plugin instead. You get these skills plus the commands, the full 20-agent gallery, and the orchestrator.
 
 ---
+
+## Contributing
+
+Prompt fixes go [upstream](https://github.com/emtcmca/promptsmith/issues); packaging, install,
+and generator fixes go here. Host compatibility reports are welcome and there is a template for
+them. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

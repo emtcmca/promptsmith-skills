@@ -1,0 +1,9 @@
+blank_issues_enabled: true
+contact_links:
+  - name: The prompt itself is wrong (upstream)
+    url: https://github.com/emtcmca/promptsmith/issues/new
+    about: >-
+      Everything under skills/ is generated from promptsmith and regenerating would
+      overwrite a fix made here. If a skill reasons badly, misses a case, or has a
+      typo in its prompt body, file it upstream. Packaging, install, and generator
+      problems belong in this repo.
