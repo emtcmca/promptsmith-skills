@@ -1,0 +1,42 @@
+name: Install or packaging problem
+description: The install failed, a file is missing after install, or a skill did not load in your agent.
+labels: [packaging]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        For problems with what a skill *says* or how it reasons, use the upstream
+        link on the previous screen -- files under `skills/` are generated and a fix
+        here would be overwritten on the next regeneration.
+  - type: input
+    id: host
+    attributes:
+      label: Which agent / host
+      description: Claude Code, Codex, Copilot, Cursor, Qwen Code, something else, plus version if you have it.
+      placeholder: Codex CLI 0.x
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: The exact command you ran
+      placeholder: npx skills add emtcmca/promptsmith-skills --skill debugger
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: Paste the terminal output. Redact anything private first.
+      render: shell
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: macOS 15 / Ubuntu 24.04 / Windows 11

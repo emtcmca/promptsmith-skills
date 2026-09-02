@@ -1,0 +1,33 @@
+name: Host compatibility report
+description: You installed these into an agent and want to report whether they worked.
+labels: [compatibility]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        The README lists the hosts a single verification install happened to report.
+        That is an observation, not a compatibility matrix -- these are plain prompts
+        with no runtime, so in principle they work anywhere `SKILL.md` is read. Reports
+        from real installs are how that list becomes something better than a guess.
+        Negative results are as useful as positive ones.
+  - type: input
+    id: host
+    attributes:
+      label: Agent / host and version
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Outcome
+      options:
+        - Installed and the skill was invoked successfully
+        - Installed, but the skill was never selected/triggered
+        - Install failed
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: Detail
+      description: Which skill(s), what you asked it to do, and anything that surprised you.
