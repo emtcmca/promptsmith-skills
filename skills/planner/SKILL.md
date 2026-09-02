@@ -71,4 +71,4 @@ makes the ordering itself unknowable (e.g. two architectures that imply differen
 
 ---
 
-_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`b863b9b`](https://github.com/emtcmca/promptsmith/commit/b863b9bdd373024b156667c037029587c0ae7271) (2026-09-02). At that commit, upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/b863b9bdd373024b156667c037029587c0ae7271/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/b863b9bdd373024b156667c037029587c0ae7271/evals/known-bad). Apache-2.0._
+_Generated from [promptsmith](https://github.com/emtcmca/promptsmith) at commit [`2398b2e`](https://github.com/emtcmca/promptsmith/commit/2398b2e31a08cab64d6badbe16b96eb5e7f59ea4) (2026-09-02). At that commit, upstream carries [37 eval cases](https://github.com/emtcmca/promptsmith/tree/2398b2e31a08cab64d6badbe16b96eb5e7f59ea4/evals/cases) and [6 known-bad regression fixtures](https://github.com/emtcmca/promptsmith/tree/2398b2e31a08cab64d6badbe16b96eb5e7f59ea4/evals/known-bad). Apache-2.0._
